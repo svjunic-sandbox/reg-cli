@@ -31,7 +31,11 @@ async function exec_capturing_cli(url) {
     let url = urlLists[i];
     getCapture({
       url: url,
-      output: `cli/${url.replace(/:/g, '').replace(/\//g, '_')}.png`
+      output: `results/cli/${url
+        .replace(/^_/g, '')
+        .replace(/:/g, '')
+        .replace(/\/$/g, '_index.html')
+        .replace(/\//g, '_')}.png`
     });
   }
 }
