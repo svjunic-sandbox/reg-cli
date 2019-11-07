@@ -17,7 +17,10 @@ async function scrollToBottom(page, viewportHeight) {
     }, nextPosition);
 
     await page
-      .waitForNavigation({ waitUntil: 'networkidle2', timeout: 300 })
+      .waitForNavigation({
+        waitUntil: 'networkidle2',
+        timeout: 50
+      })
       .catch(e => console.log('timeout exceed. proceed to next operation'));
 
     currentPosition = nextPosition;
@@ -35,22 +38,34 @@ async function getCapture({ url, output }) {
 
   const viewportHeight = 1200;
   const viewportWidth = 1600;
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true
+  });
 
   const page = await browser.newPage();
-  page.setViewport({ width: viewportWidth, height: viewportHeight });
+  page.setViewport({
+    width: viewportWidth,
+    height: viewportHeight
+  });
 
   await page.goto(url);
 
   // 1
   await page
-    .waitForNavigation({ waitUntil: 'networkidle2', timeout: 5000 })
+    .waitForNavigation({
+      waitUntil: 'networkidle0',
+      timeout: 5000
+    })
     .catch(e => console.log('timeout exceed. proceed to next operation'));
 
   await scrollToBottom(page, viewportHeight);
+
   await page
-    .waitForNavigation({ waitUntil: 'networkidle2', timeout: 500 })
-    .catch(e => console.log('delay'));
+    .waitForNavigation({
+      waitUntil: 'networkidle2',
+      timeout: 500
+    })
+    .catch(e => console.log('timeout exceed. proceed to next operation'));
 
   await page.screenshot({
     path: output,

@@ -14,3 +14,5 @@ nginx.pid
 keys.mjs
 .sample
 config.js
+results
+reg.json

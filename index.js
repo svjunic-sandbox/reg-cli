@@ -5,34 +5,39 @@ const execSync = require('child_process').execSync;
 
 const fs = require('fs');
 
-const { PASH_LIST, HOSTS } = require('./config.js');
+const { PATH_LIST, HOSTS } = require('./config.js');
 
-const dirlist = [
-  './results/production',
-  './results/development',
-  './results/cli',
-  './results/diff'
-];
+const dirlist = ['./results/production', './results/development', './results/cli', './results/diff'];
 
-dirlist.forEach(path => {
+for (let i = 0; i < dirlist.length; ++i) {
+  let path = dirlist[i];
   if (!fs.existsSync(path)) {
     fs.mkdirSync(path, { recursive: true });
   }
-});
+}
 
 let cliargv = [...process.argv];
 cliargv.shift(); // node
 cliargv.shift(); // runnnig script path
 
 if (cliargv && cliargv.length > 0) {
-  urlLists.forEach(url => {
+  exec_capturing_cli();
+} else {
+  exec_capturing_reg();
+}
+
+async function exec_capturing_cli(url) {
+  for (let i = 0; i < urlLists.length; ++i) {
+    let url = urlLists[i];
     getCapture({
       url: url,
       output: `cli/${url.replace(/:/g, '').replace(/\//g, '_')}.png`
     });
-  });
-} else {
-  PASH_LIST.forEach(async url => {
+  }
+}
+async function exec_capturing_reg() {
+  for (let i = 0; i < PATH_LIST.length; ++i) {
+    let url = PATH_LIST[i];
     console.log(url);
     try {
       const promises = [];
@@ -60,9 +65,7 @@ if (cliargv && cliargv.length > 0) {
       await Promise.all(promises);
 
       //reg
-      execSync(
-        'node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html'
-      );
+      execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
     } catch (err) {
       err.stdout;
       err.stderr;
@@ -70,5 +73,5 @@ if (cliargv && cliargv.length > 0) {
       err.signal;
       err.status;
     }
-  });
+  }
 }
