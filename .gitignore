@@ -13,4 +13,4 @@ node_modules
 nginx.pid
 keys.mjs
 .sample
-config.base.js
+config.js
