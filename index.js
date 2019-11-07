@@ -52,12 +52,16 @@ function getCapture(threadNumber) {
 
 // 他プロセスの作成
 const CPUs = require('os').cpus().length;
+let usingThreadNumber = CPUs.length;
 const childs = [];
 for (let i = 0; i < CPUs; ++i) {
   let child = fork(SUBROUTINE_SCRIPT_PATH);
   child.on('message', function(data) {
     console.log(data);
-    if (queries.length === 0) {
+
+    if (data.message === 'exit') usingThreadNumber--;
+
+    if (usingThreadNumber === 0) {
       console.log('thread exit');
       exec_reg();
       return;

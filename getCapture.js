@@ -110,6 +110,10 @@ process.on('message', async function(data) {
   });
 
   if (processExit) {
+    process.send({
+      message: 'exit',
+      thread: threadNumber
+    });
     process.exit();
   }
 });
