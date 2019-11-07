@@ -53,8 +53,8 @@ async function getCapture({ url, output }) {
   // 1
   await page
     .waitForNavigation({
-      waitUntil: 'networkidle0',
-      timeout: 3000
+      waitUntil: 'networkidle0'
+      //timeout: 10000
     })
     .catch(e => console.log('timeout exceed. proceed to next operation'));
 

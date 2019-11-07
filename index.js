@@ -32,10 +32,10 @@ async function exec_capturing_cli(url) {
     getCapture({
       url: url,
       output: `results/cli/${url
-        .replace(/^_/g, '')
         .replace(/:/g, '')
         .replace(/\/$/g, '_index.html')
-        .replace(/\//g, '_')}.png`
+        .replace(/\//g, '_')
+        .replace(/^_/g, '')}.png`
     });
   }
 }
@@ -50,10 +50,10 @@ async function exec_capturing_reg() {
       getCapture({
         url: `${HOSTS.production}${url}`,
         output: `results/production/${url
-          .replace(/^_/g, '')
           .replace(/:/g, '')
           .replace(/\/$/g, '_index.html')
-          .replace(/\//g, '_')}.png`
+          .replace(/\//g, '_')
+          .replace(/^_/g, '')}.png`
       })
     );
 
@@ -61,10 +61,10 @@ async function exec_capturing_reg() {
       getCapture({
         url: `${HOSTS.development}${url}`,
         output: `results/development/${url
-          .replace(/^_/g, '')
           .replace(/:/g, '')
           .replace(/\/$/g, '_index.html')
-          .replace(/\//g, '_')}.png`
+          .replace(/\//g, '_')
+          .replace(/^_/g, '')}.png`
       })
     );
 
