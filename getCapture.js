@@ -37,7 +37,7 @@ async function getCapture({ url, output }) {
   console.log(url, output);
 
   const viewportHeight = 1200;
-  const viewportWidth = 1600;
+  const viewportWidth = 1200;
   const browser = await puppeteer.launch({
     headless: true
   });
@@ -54,7 +54,7 @@ async function getCapture({ url, output }) {
   await page
     .waitForNavigation({
       waitUntil: 'networkidle0',
-      timeout: 5000
+      timeout: 3000
     })
     .catch(e => console.log('timeout exceed. proceed to next operation'));
 

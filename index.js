@@ -37,41 +37,44 @@ async function exec_capturing_cli(url) {
 }
 async function exec_capturing_reg() {
   for (let i = 0; i < PATH_LIST.length; ++i) {
+    let promises = [];
+
     let url = PATH_LIST[i];
     console.log(url);
-    try {
-      const promises = [];
 
-      promises.push(
-        getCapture({
-          url: `${HOSTS.production}${url}`,
-          output: `results/production/${url
-            .replace(/:/g, '')
-            .replace(/\/$/g, '_index.html')
-            .replace(/\//g, '_')}.png`
-        })
-      );
+    promises.push(
+      getCapture({
+        url: `${HOSTS.production}${url}`,
+        output: `results/production/${url
+          .replace(/^_/g, '')
+          .replace(/:/g, '')
+          .replace(/\/$/g, '_index.html')
+          .replace(/\//g, '_')}.png`
+      })
+    );
 
-      promises.push(
-        getCapture({
-          url: `${HOSTS.development}${url}`,
-          output: `results/development/${url
-            .replace(/:/g, '')
-            .replace(/\/$/g, '_index.html')
-            .replace(/\//g, '_')}.png`
-        })
-      );
+    promises.push(
+      getCapture({
+        url: `${HOSTS.development}${url}`,
+        output: `results/development/${url
+          .replace(/^_/g, '')
+          .replace(/:/g, '')
+          .replace(/\/$/g, '_index.html')
+          .replace(/\//g, '_')}.png`
+      })
+    );
 
-      await Promise.all(promises);
+    await Promise.all(promises);
+  }
 
-      //reg
-      execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
-    } catch (err) {
-      err.stdout;
-      err.stderr;
-      err.pid;
-      err.signal;
-      err.status;
-    }
+  try {
+    //reg
+    execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
+  } catch (err) {
+    err.stdout;
+    err.stderr;
+    err.pid;
+    err.signal;
+    err.status;
   }
 }
