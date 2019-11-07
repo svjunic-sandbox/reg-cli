@@ -47,6 +47,7 @@ function createQuery() {
 function getCapture(threadNumber) {
   const query = queries.length > 0 ? queries.shift() : undefined;
   const processExit = queries.length < childs.length;
+  console.log({ query: query, processExit: processExit, threadNumber: threadNumber });
   childs[threadNumber].send({ query: query, processExit: processExit, threadNumber: threadNumber });
 }
 
@@ -68,6 +69,7 @@ for (let i = 0; i < CPUs; ++i) {
     }
 
     if (queries.length > 0) {
+      console.log('2回目', queries.length);
       getCapture(data.threadNumber);
     }
   });

@@ -7,10 +7,11 @@ process.on('exit', function() {
 //process.on('message', async function({ url, output }, processExit = false) {
 process.on('message', async function(data) {
   const threadNumber = data.threadNumber;
+
   if (data.query === undefined) {
     process.send({
       message: 'exit',
-      thread: threadNumber
+      threadNumber: threadNumber
     });
     process.exit();
     return;
@@ -104,15 +105,15 @@ process.on('message', async function(data) {
 
   await getCapture();
 
-  process.send({
-    message: 'fix',
-    thread: threadNumber
-  });
-
-  if (processExit) {
+  if (!processExit) {
+    process.send({
+      message: 'fix',
+      threadNumber: threadNumber
+    });
+  } else {
     process.send({
       message: 'exit',
-      thread: threadNumber
+      threadNumber: threadNumber
     });
     process.exit();
   }
