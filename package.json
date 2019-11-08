@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "reg": "node reg.js"
+    "start": "time node index.js",
+    "reg": "time node reg.js"
   },
   "author": "sv.junic",
   "license": "UNLICENSED",

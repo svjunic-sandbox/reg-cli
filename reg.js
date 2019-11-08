@@ -1,5 +1,3 @@
-console.time();
-
 const execSync = require('child_process').execSync;
 
 try {
@@ -12,5 +10,3 @@ try {
   err.signal;
   err.status;
 }
-
-console.timeEnd();
