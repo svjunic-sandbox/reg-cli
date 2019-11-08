@@ -89,6 +89,7 @@ function exec_reg() {
   try {
     //reg
     execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
+    console.timeEnd();
     process.exit();
   } catch (err) {
     err.stdout;
@@ -97,6 +98,4 @@ function exec_reg() {
     err.signal;
     err.status;
   }
-
-  console.timeEnd();
 }
