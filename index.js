@@ -1,5 +1,3 @@
-console.time();
-
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 
@@ -97,6 +95,4 @@ function exec_reg() {
     err.signal;
     err.status;
   }
-
-  console.timeEnd();
 }

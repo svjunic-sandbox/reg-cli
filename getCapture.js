@@ -73,8 +73,8 @@ process.on('message', async function(data) {
     // 1
     await page
       .waitForNavigation({
-        waitUntil: 'networkidle0'
-        //timeout: 10000
+        waitUntil: 'networkidle0',
+        timeout: 100000
       })
       .catch(e => {
         // console.log('timeout exceed. proceed to next operation'));
@@ -85,7 +85,8 @@ process.on('message', async function(data) {
     await page
       .waitForNavigation({
         waitUntil: 'networkidle2',
-        timeout: 500
+        //timeout: 500
+        timeout: 100000
       })
       .catch(e => {
         // console.log('timeout exceed. proceed to next operation');
