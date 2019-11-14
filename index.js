@@ -65,6 +65,7 @@ for (let i = 0; i < CPUs; ++i) {
     if (usingThreadNumber === 0) {
       console.log('thread exit');
       exec_reg();
+      process.exit();
       return;
     }
 
@@ -87,7 +88,6 @@ function exec_reg() {
   try {
     //reg
     execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
-    process.exit();
   } catch (err) {
     err.stdout;
     err.stderr;
