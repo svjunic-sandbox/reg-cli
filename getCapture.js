@@ -82,8 +82,10 @@ async function capture(data) {
   async function getCapture() {
     await page
       .goto(url, {
-        waitUntil: 'load',
-        timeout: 0
+        waitUntil: 'networkidle2',
+        timeout: 30000
+        //waitUntil: 'load',
+        //timeout: 0
       })
       .catch(e => {
         // console.log('timeout exceed. proceed to next operation'));
@@ -97,14 +99,16 @@ async function capture(data) {
       console.log('error', url);
     }
 
-    await page
-      .waitForNavigation({
-        waitUntil: 'networkidle2',
-        timeout: 3000
-      })
-      .catch(e => {
-        // console.log('timeout exceed. proceed to next operation');
-      });
+    await page.waitFor(1000); // ミリ秒
+
+    //await page
+    //  .waitForNavigation({
+    //    waitUntil: 'networkidle2',
+    //    timeout: 3000
+    //  })
+    //  .catch(e => {
+    //    // console.log('timeout exceed. proceed to next operation');
+    //  });
 
     await page.screenshot({
       path: output,
