@@ -44,33 +44,42 @@ function createQuery() {
   return queries;
 }
 
+function setup(threadNumber) {
+  childs[threadNumber].send({ query: 'setup', threadNumber: threadNumber });
+}
+
+function close(threadNumber) {
+  childs[threadNumber].send({ query: 'close', threadNumber: threadNumber });
+}
+
 function getCapture(threadNumber) {
   const query = queries.length > 0 ? queries.shift() : undefined;
   const processExit = queries.length < childs.length;
-  //console.log({ query: query, processExit: processExit, threadNumber: threadNumber });
   childs[threadNumber].send({ query: query, processExit: processExit, threadNumber: threadNumber });
 }
 
 // 他プロセスの作成
 const CPUs = require('os').cpus().length;
-let usingThreadNumber = CPUs.length;
+let usingThreadNumber = CPUs;
+
 const childs = [];
 for (let i = 0; i < CPUs; ++i) {
   let child = fork(SUBROUTINE_SCRIPT_PATH);
   child.on('message', function(data) {
-    console.log(data);
-
     if (data.message === 'exit') usingThreadNumber--;
+    if (data.message === 'close') usingThreadNumber--;
+
+    if ((data.message === 'fix' || data.message === 'setup-fix') && queries.length > 0) {
+      getCapture(data.threadNumber);
+    } else {
+      close(data.threadNumber);
+    }
 
     if (usingThreadNumber === 0) {
       console.log('thread exit');
       exec_reg();
       process.exit();
       return;
-    }
-
-    if (queries.length > 0) {
-      getCapture(data.threadNumber);
     }
   });
   childs.push(child);
@@ -81,7 +90,8 @@ const queries = createQuery();
 
 // 実行
 for (let i = 0; i < childs.length; ++i) {
-  getCapture(i);
+  //getCapture(i);
+  setup(i);
 }
 
 function exec_reg() {

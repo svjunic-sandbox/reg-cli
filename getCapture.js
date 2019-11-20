@@ -1,11 +1,27 @@
 const puppeteer = require('puppeteer');
 
-process.on('exit', function() {
-  console.log('child exit');
-});
+let page, browser;
+const viewportHeight = 1200;
+const viewportWidth = 1200;
 
-//process.on('message', async function({ url, output }, processExit = false) {
-process.on('message', async function(data) {
+async function setup(data) {
+  browser = await puppeteer.launch({
+    headless: true
+  });
+
+  page = await browser.newPage();
+
+  await page.setUserAgent(
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
+  );
+
+  await page.setViewport({
+    width: viewportWidth,
+    height: viewportHeight
+  });
+}
+
+async function capture(data) {
   const threadNumber = data.threadNumber;
 
   if (data.query === undefined) {
@@ -18,7 +34,6 @@ process.on('message', async function(data) {
   }
 
   const { url, output } = data.query;
-  const processExit = data.processExit;
 
   async function scrollToBottom(page, viewportHeight) {
     const getScrollHeight = () => {
@@ -56,25 +71,13 @@ process.on('message', async function(data) {
   }
 
   async function getCapture() {
-    const viewportHeight = 1200;
-    const viewportWidth = 1200;
-    const browser = await puppeteer.launch({
-      headless: true
-    });
-
-    const page = await browser.newPage();
-    page.setViewport({
-      width: viewportWidth,
-      height: viewportHeight
-    });
-
     await page.goto(url);
 
     // 1
     await page
       .waitForNavigation({
-        waitUntil: 'networkidle0',
-        timeout: 0
+        waitUntil: 'networkidle2',
+        timeout: 5000
       })
       .catch(e => {
         // console.log('timeout exceed. proceed to next operation'));
@@ -85,7 +88,7 @@ process.on('message', async function(data) {
     await page
       .waitForNavigation({
         waitUntil: 'networkidle2',
-        timeout: 0
+        timeout: 3000
       })
       .catch(e => {
         // console.log('timeout exceed. proceed to next operation');
@@ -97,24 +100,50 @@ process.on('message', async function(data) {
     });
 
     console.log('save screenshot: ' + url);
-    await browser.close();
   }
 
   console.log('start screenshot: ' + url);
-  console.log(data.query);
 
   await getCapture();
+}
 
-  if (!processExit) {
+process.on('exit', function() {
+  console.log('child exit');
+});
+
+//process.on('message', async function({ url, output }, processExit = false) {
+process.on('message', async function(data) {
+  console.log(data);
+
+  const threadNumber = data.threadNumber;
+
+  if (data.query === 'setup') {
+    await setup(data);
     process.send({
-      message: 'fix',
+      message: 'setup-fix',
       threadNumber: threadNumber
     });
-  } else {
+  } else if (data.query === 'close') {
+    await browser.close();
     process.send({
-      message: 'exit',
+      message: 'close',
       threadNumber: threadNumber
     });
     process.exit();
+  } else {
+    await capture(data);
+    if (!data.processExit) {
+      process.send({
+        message: 'fix',
+        threadNumber: threadNumber
+      });
+    } else {
+      await browser.close();
+      process.send({
+        message: 'exit',
+        threadNumber: threadNumber
+      });
+      process.exit();
+    }
   }
 });
