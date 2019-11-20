@@ -6,7 +6,16 @@ const viewportWidth = 1200;
 
 async function setup(data) {
   browser = await puppeteer.launch({
-    headless: true
+    headless: true,
+    args: [
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+      '--disable-setuid-sandbox',
+      '--no-first-run',
+      '--no-sandbox',
+      '--no-zygote',
+      '--single-process'
+    ]
   });
 
   page = await browser.newPage();
@@ -71,19 +80,22 @@ async function capture(data) {
   }
 
   async function getCapture() {
-    await page.goto(url);
-
-    // 1
     await page
-      .waitForNavigation({
-        waitUntil: 'networkidle2',
-        timeout: 5000
+      .goto(url, {
+        waitUntil: 'load',
+        timeout: 0
       })
       .catch(e => {
         // console.log('timeout exceed. proceed to next operation'));
+        console.log('error goto', url);
+        //console.log(e);
       });
 
-    await scrollToBottom(page, viewportHeight);
+    try {
+      await scrollToBottom(page, viewportHeight);
+    } catch (e) {
+      console.log('error', url);
+    }
 
     await page
       .waitForNavigation({
