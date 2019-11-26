@@ -13,9 +13,11 @@ node_modules
 nginx.pid
 keys.mjs
 .sample
+
 config.js
-results
 reg.json
+
+results*
 
 *.log
 *.zip
