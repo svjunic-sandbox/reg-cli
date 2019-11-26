@@ -5,9 +5,55 @@ const { fork, execSync } = require('child_process');
 
 //const getCapture = require('./getCapture.js');
 
-const { PATH_LIST, HOSTS } = require('./config.js');
+const { PATH_LIST, UA, HOSTS } = require('./config.js');
 
-const dirlist = ['./results/production', './results/development', './results/cli', './results/diff'];
+//const dirlist = ['./results/production', './results/development', './results/cli', './results/diff'];
+let ua = '';
+const dirlist = [];
+
+const VERSION = process.argv[2];
+const DEVICE = process.argv[3];
+const PATH_LIST_DEVICE = PATH_LIST[DEVICE];
+
+console.log(DEVICE);
+console.log(PATH_LIST_DEVICE);
+
+switch (VERSION) {
+  case 'before':
+    dirlist.push('./results/before/pc/');
+    dirlist.push('./results/before/sp/');
+    dirlist.push('./results/before/mb/');
+    break;
+  case 'after':
+    dirlist.push('./results/after/pc/');
+    dirlist.push('./results/after/sp/');
+    dirlist.push('./results/after/mb/');
+    break;
+  default:
+    dirlist.push('./results/before/pc/');
+    dirlist.push('./results/before/sp/');
+    dirlist.push('./results/before/mb/');
+    dirlist.push('./results/after/pc/');
+    dirlist.push('./results/after/sp/');
+    dirlist.push('./results/after/mb/');
+    break;
+}
+
+switch (DEVICE) {
+  case 'PC':
+    ua = UA.PC;
+    break;
+  case 'SP':
+    ua = UA.SP;
+    break;
+  case 'MB':
+    ua = UA.MB;
+    break;
+  default:
+    ua = UA.PC;
+    break;
+}
+
 for (let i = 0; i < dirlist.length; ++i) {
   let path = dirlist[i];
   if (!fs.existsSync(path)) {
@@ -19,21 +65,13 @@ const SUBROUTINE_SCRIPT_PATH = './getCapture.js';
 
 function createQuery() {
   const queries = [];
-  for (let i = 0; i < PATH_LIST.length; ++i) {
-    let url = PATH_LIST[i];
+  for (let i = 0; i < PATH_LIST_DEVICE.length; ++i) {
+    let url = PATH_LIST_DEVICE[i];
 
     queries.push({
       url: `${HOSTS.production}${url}`,
-      output: `results/production/${url
-        .replace(/:/g, '')
-        .replace(/\/$/g, '_index.html')
-        .replace(/\//g, '_')
-        .replace(/^_/g, '')}.png`
-    });
-
-    queries.push({
-      url: `${HOSTS.development}${url}`,
-      output: `results/development/${url
+      ua: ua,
+      output: `results/${VERSION}/${DEVICE}/${url
         .replace(/:/g, '')
         .replace(/\/$/g, '_index.html')
         .replace(/\//g, '_')
@@ -97,7 +135,7 @@ for (let i = 0; i < childs.length; ++i) {
 function exec_reg() {
   try {
     //reg
-    execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
+    //execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
   } catch (err) {
     err.stdout;
     err.stderr;

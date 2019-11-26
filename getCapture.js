@@ -20,10 +20,6 @@ async function setup(data) {
 
   page = await browser.newPage();
 
-  await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
-  );
-
   await page.setViewport({
     width: viewportWidth,
     height: viewportHeight
@@ -42,7 +38,9 @@ async function capture(data) {
     return;
   }
 
-  const { url, output } = data.query;
+  const { url, ua, output } = data.query;
+
+  await page.setUserAgent(ua);
 
   async function scrollToBottom(page, viewportHeight) {
     const getScrollHeight = () => {

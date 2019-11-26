@@ -4,7 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "time node index.js",
+    "start": "echo 'nothing!'",
+    "before-pc": "time node index.js before PC",
+    "before-sp": "time node index.js before SP",
+    "before-mb": "time node index.js before MB",
+    "after-pc": "time node index.js after PC",
+    "after-sp": "time node index.js after SP",
+    "after-mb": "time node index.js after MB",
+    "diff": "time node index.js diff",
     "reg": "time node reg.js"
   },
   "author": "sv.junic",
