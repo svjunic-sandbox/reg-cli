@@ -78,10 +78,12 @@ async function capture(data) {
   }
 
   async function getCapture() {
-    await page
+    const response = await page
       .goto(url, {
-        waitUntil: 'networkidle2',
-        timeout: 30000
+        waitUntil: 'networkidle0',
+        timeout: 0
+        //waitUntil: 'networkidle2',
+        //timeout: 30000
         //waitUntil: 'load',
         //timeout: 0
       })
@@ -90,6 +92,12 @@ async function capture(data) {
         console.log('error goto', url);
         //console.log(e);
       });
+
+    const status = response.headers().status;
+    console.log(`***** status : ${status} : ${url}`);
+    if (response.headers().status === '404') {
+      return;
+    }
 
     try {
       await scrollToBottom(page, viewportHeight);
@@ -127,37 +135,47 @@ process.on('exit', function() {
 
 //process.on('message', async function({ url, output }, processExit = false) {
 process.on('message', async function(data) {
-  console.log(data);
+  //console.log(data);
 
   const threadNumber = data.threadNumber;
 
-  if (data.query === 'setup') {
-    await setup(data);
-    process.send({
-      message: 'setup-fix',
-      threadNumber: threadNumber
-    });
-  } else if (data.query === 'close') {
-    await browser.close();
-    process.send({
-      message: 'close',
-      threadNumber: threadNumber
-    });
-    process.exit();
-  } else {
-    await capture(data);
-    if (!data.processExit) {
+  try {
+    if (data.query === 'setup') {
+      await setup(data);
       process.send({
-        message: 'fix',
+        message: 'setup-fix',
         threadNumber: threadNumber
       });
-    } else {
+    } else if (data.query === 'close') {
       await browser.close();
       process.send({
-        message: 'exit',
+        message: 'close',
         threadNumber: threadNumber
       });
       process.exit();
+    } else {
+      await capture(data);
+      if (!data.processExit) {
+        process.send({
+          message: 'fix',
+          threadNumber: threadNumber
+        });
+      } else {
+        await browser.close();
+        process.send({
+          message: 'exit',
+          threadNumber: threadNumber
+        });
+        process.exit();
+      }
     }
+  } catch (e) {
+    console.log('ERROR');
+    console.log(data);
+    console.log(e);
+    process.send({
+      message: 'error',
+      threadNumber: threadNumber
+    });
   }
 });

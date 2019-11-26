@@ -107,7 +107,8 @@ for (let i = 0; i < CPUs; ++i) {
     if (data.message === 'exit') usingThreadNumber--;
     if (data.message === 'close') usingThreadNumber--;
 
-    if ((data.message === 'fix' || data.message === 'setup-fix') && queries.length > 0) {
+    // errorでも次に進む
+    if ((data.message === 'fix' || data.message === 'error' || data.message === 'setup-fix') && queries.length > 0) {
       getCapture(data.threadNumber);
     } else {
       close(data.threadNumber);
