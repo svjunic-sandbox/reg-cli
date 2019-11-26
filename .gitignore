@@ -16,3 +16,6 @@ keys.mjs
 config.js
 results
 reg.json
+
+*.log
+*.zip

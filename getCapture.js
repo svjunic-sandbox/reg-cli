@@ -1,10 +1,9 @@
-let puppeteer, page, browser;
+const puppeteer = require('puppeteer');
+let page, browser;
 const viewportHeight = 1200;
 const viewportWidth = 1200;
 
 async function setup() {
-  let puppeteer = require('puppeteer');
-
   browser = await puppeteer.launch({
     headless: true,
     args: [
