@@ -20,22 +20,22 @@ console.log(PATH_LIST_DEVICE);
 
 switch (VERSION) {
   case 'before':
-    dirlist.push('./results/before/pc/');
-    dirlist.push('./results/before/sp/');
-    dirlist.push('./results/before/mb/');
+    dirlist.push('./results/pc/before/');
+    dirlist.push('./results/sp/before/');
+    dirlist.push('./results/mb/before/');
     break;
   case 'after':
-    dirlist.push('./results/after/pc/');
-    dirlist.push('./results/after/sp/');
-    dirlist.push('./results/after/mb/');
+    dirlist.push('./results/pc/after/');
+    dirlist.push('./results/sp/after/');
+    dirlist.push('./results/mb/after/');
     break;
   default:
-    dirlist.push('./results/before/pc/');
-    dirlist.push('./results/before/sp/');
-    dirlist.push('./results/before/mb/');
-    dirlist.push('./results/after/pc/');
-    dirlist.push('./results/after/sp/');
-    dirlist.push('./results/after/mb/');
+    dirlist.push('./results/pc/before/');
+    dirlist.push('./results/sp/before/');
+    dirlist.push('./results/mb/before/');
+    dirlist.push('./results/pc/after/');
+    dirlist.push('./results/sp/after/');
+    dirlist.push('./results/mb/after/');
     break;
 }
 
@@ -71,7 +71,7 @@ function createQuery() {
     queries.push({
       url: `${HOSTS.production}${url}`,
       ua: ua,
-      output: `results/${VERSION}/${DEVICE}/${url
+      output: `results/${DEVICE}/${VERSION}/${url
         .replace(/:/g, '')
         .replace(/\/$/g, '_index.html')
         .replace(/\//g, '_')

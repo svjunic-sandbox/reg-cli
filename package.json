@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "echo 'nothing!'",
+    "before": "npm run before-pc && npm run before-sp && npm run before-mb",
+    "after": "npm run after-pc && npm run after-sp && npm run after-mb",
     "before-pc": "time node index.js before PC",
     "before-sp": "time node index.js before SP",
     "before-mb": "time node index.js before MB",
