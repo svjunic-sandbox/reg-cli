@@ -70,6 +70,7 @@ function createQuery() {
 
     queries.push({
       url: `${HOSTS.production}${url}`,
+      device: DEVICE,
       ua: ua,
       output: `results/${DEVICE}/${VERSION}/${url
         .replace(/:/g, '')

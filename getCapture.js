@@ -34,10 +34,9 @@ async function capture(data) {
       threadNumber: threadNumber
     });
     process.exit();
-    return;
   }
 
-  const { url, ua, output } = data.query;
+  const { url, device, ua, output } = data.query;
 
   await page.setUserAgent(ua);
 
@@ -103,6 +102,20 @@ async function capture(data) {
     } catch (e) {
       console.log('error', url);
     }
+
+    //switch (device) {
+    //  case 'PC':
+    //    page.hover('.mogeta');
+    //    break;
+    //  case 'SP':
+    //    page.tap('.mogezo');
+    //    break;
+    //  case 'MB':
+    //    break;
+    //  default:
+    //    page.hover('mogeta');
+    //    break;
+    //}
 
     await page.waitFor(1000); // ミリ秒
 
