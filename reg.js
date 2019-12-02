@@ -1,5 +1,5 @@
-const execSync = require('child_process').execSync;
-const fs = require('fs');
+import { execSync } from 'child_process';
+import fs from 'fs';
 
 const dirlist = [];
 dirlist.push('./results/pc/diff/');

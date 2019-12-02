@@ -1,13 +1,13 @@
-const fs = require('fs');
-const puppeteer = require('puppeteer');
+import fs from 'fs';
 
-const { fork, execSync } = require('child_process');
+import { fork } from 'child_process';
 
-//const getCapture = require('./getCapture.js');
+import { PATH_LIST, UA, HOSTS } from './config.js';
 
-const { PATH_LIST, UA, HOSTS } = require('./config.js');
+import OS from 'os';
 
-//const dirlist = ['./results/production', './results/development', './results/cli', './results/diff'];
+const FLAGS = '--experimental-modules';
+
 let ua = '';
 const dirlist = [];
 
@@ -84,6 +84,8 @@ function createQuery() {
 }
 
 function setup(threadNumber) {
+  console.log(childs); // これがないと何故か動かん・・・。
+  console.log({ query: 'setup', threadNumber: threadNumber });
   childs[threadNumber].send({ query: 'setup', threadNumber: threadNumber });
 }
 
@@ -98,12 +100,12 @@ function getCapture(threadNumber) {
 }
 
 // 他プロセスの作成
-const CPUs = require('os').cpus().length;
+const CPUs = OS.cpus().length;
 let usingThreadNumber = CPUs;
 
 const childs = [];
 for (let i = 0; i < CPUs; ++i) {
-  let child = fork(SUBROUTINE_SCRIPT_PATH);
+  let child = fork(SUBROUTINE_SCRIPT_PATH, [FLAGS]);
   child.on('message', function(data) {
     if (data.message === 'exit') usingThreadNumber--;
     if (data.message === 'close') usingThreadNumber--;
@@ -119,7 +121,6 @@ for (let i = 0; i < CPUs; ++i) {
       console.log('thread exit');
       exec_reg();
       process.exit();
-      return;
     }
   });
   childs.push(child);

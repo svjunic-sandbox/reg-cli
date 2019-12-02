@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
-const devices = require('puppeteer/DeviceDescriptors');
+import puppeteer from 'puppeteer';
+const devices = puppeteer.device;
 
 let page, browser;
 
@@ -168,18 +168,21 @@ process.on('exit', function() {
 
 //process.on('message', async function({ url, output }, processExit = false) {
 process.on('message', async function(data) {
+  console.log(data);
   //console.log(data);
 
   const threadNumber = data.threadNumber;
 
   try {
     if (data.query === 'setup') {
+      console.log('setup');
       await setup();
       process.send({
         message: 'setup-fix',
         threadNumber: threadNumber
       });
     } else if (data.query === 'close') {
+      console.log('close');
       await browser.close();
       process.send({
         message: 'close',
@@ -187,6 +190,7 @@ process.on('message', async function(data) {
       });
       process.exit();
     } else {
+      console.log('capture');
       await capture(data);
       if (!data.processExit) {
         process.send({
@@ -194,6 +198,7 @@ process.on('message', async function(data) {
           threadNumber: threadNumber
         });
       } else {
+        console.log('exit');
         await browser.close();
         process.send({
           message: 'exit',
