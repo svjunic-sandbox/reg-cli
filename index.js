@@ -6,7 +6,10 @@ import { PATH_LIST, UA, HOSTS } from './config.js';
 
 import OS from 'os';
 
-const FLAGS = '--experimental-modules';
+//const = '--experimental-modules';
+const FLAGS = {
+  NODE_OPTIONS: '--experimental-modules'
+};
 
 let ua = '';
 const dirlist = [];
@@ -63,49 +66,13 @@ for (let i = 0; i < dirlist.length; ++i) {
 
 const SUBROUTINE_SCRIPT_PATH = './getCapture.js';
 
-function createQuery() {
-  const queries = [];
-  for (let i = 0; i < PATH_LIST_DEVICE.length; ++i) {
-    let url = PATH_LIST_DEVICE[i];
-
-    queries.push({
-      url: `${HOSTS.production}${url}`,
-      device: DEVICE,
-      ua: ua,
-      output: `results/${DEVICE}/${VERSION}/${url
-        .replace(/:/g, '')
-        .replace(/\/$/g, '_index.html')
-        .replace(/\//g, '_')
-        .replace(/^_/g, '')}.png`
-    });
-  }
-
-  return queries;
-}
-
-function setup(threadNumber) {
-  console.log(childs); // これがないと何故か動かん・・・。
-  console.log({ query: 'setup', threadNumber: threadNumber });
-  childs[threadNumber].send({ query: 'setup', threadNumber: threadNumber });
-}
-
-function close(threadNumber) {
-  childs[threadNumber].send({ query: 'close', threadNumber: threadNumber });
-}
-
-function getCapture(threadNumber) {
-  const query = queries.length > 0 ? queries.shift() : undefined;
-  const processExit = queries.length < childs.length;
-  childs[threadNumber].send({ query: query, processExit: processExit, threadNumber: threadNumber });
-}
-
 // 他プロセスの作成
 const CPUs = OS.cpus().length;
 let usingThreadNumber = CPUs;
 
 const childs = [];
 for (let i = 0; i < CPUs; ++i) {
-  let child = fork(SUBROUTINE_SCRIPT_PATH, [FLAGS]);
+  let child = fork(SUBROUTINE_SCRIPT_PATH, FLAGS);
   child.on('message', function(data) {
     if (data.message === 'exit') usingThreadNumber--;
     if (data.message === 'close') usingThreadNumber--;
@@ -133,6 +100,43 @@ const queries = createQuery();
 for (let i = 0; i < childs.length; ++i) {
   //getCapture(i);
   setup(i);
+}
+
+function createQuery() {
+  const queries = [];
+  for (let i = 0; i < PATH_LIST_DEVICE.length; ++i) {
+    let url = PATH_LIST_DEVICE[i];
+
+    queries.push({
+      url: `${HOSTS.production}${url}`,
+      device: DEVICE,
+      ua: ua,
+      output: `results/${DEVICE}/${VERSION}/${url
+        .replace(/:/g, '')
+        .replace(/\/$/g, '_index.html')
+        .replace(/\//g, '_')
+        .replace(/^_/g, '')}.png`
+    });
+  }
+
+  return queries;
+}
+
+function setup(threadNumber) {
+  console.log(childs.length); // これがないと何故か動かん・・・。
+  console.log({ query: 'setup', threadNumber: threadNumber });
+  childs[threadNumber].send({ query: 'setup', threadNumber: threadNumber });
+}
+
+function close(threadNumber) {
+  childs[threadNumber].send({ query: 'close', threadNumber: threadNumber });
+}
+
+function getCapture(threadNumber) {
+  const query = queries.length > 0 ? queries.shift() : undefined;
+  const processExit = queries.length < childs.length;
+  console.log({ query: query, processExit: processExit, threadNumber: threadNumber });
+  childs[threadNumber].send({ query: query, processExit: processExit, threadNumber: threadNumber });
 }
 
 function exec_reg() {
