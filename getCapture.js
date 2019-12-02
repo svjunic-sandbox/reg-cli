@@ -1,5 +1,8 @@
 const puppeteer = require('puppeteer');
+const devices = require('puppeteer/DeviceDescriptors');
+
 let page, browser;
+
 const viewportHeight = 1200;
 const viewportWidth = 1200;
 
@@ -18,11 +21,6 @@ async function setup() {
   });
 
   page = await browser.newPage();
-
-  await page.setViewport({
-    width: viewportWidth,
-    height: viewportHeight
-  });
 }
 
 async function capture(data) {
@@ -38,7 +36,30 @@ async function capture(data) {
 
   const { url, device, ua, output } = data.query;
 
-  await page.setUserAgent(ua);
+  if (device === 'PC') {
+    await page.setViewport({
+      width: 1200,
+      height: 1200,
+      deviceScaleFactor: 1
+    });
+    await page.setUserAgent(ua);
+  } else if (device === 'SP') {
+    await page.emulate(devices['iPhone 6']); // デバイス適用
+  } else if (device === 'MB') {
+    await page.setViewport({
+      width: 320,
+      height: 300,
+      deviceScaleFactor: 1
+    });
+    await page.setUserAgent(ua);
+  } else {
+    await page.setViewport({
+      width: 1200,
+      height: 1200,
+      deviceScaleFactor: 1
+    });
+    await page.setUserAgent(ua);
+  }
 
   async function scrollToBottom(page, viewportHeight) {
     const getScrollHeight = () => {
