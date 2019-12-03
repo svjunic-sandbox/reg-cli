@@ -14,7 +14,6 @@
     "after-pc": "time node --experimental-modules index.js after PC",
     "after-sp": "time node --experimental-modules index.js after SP",
     "after-mb": "time node --experimental-modules index.js after MB",
-    "diff": "time node --experimental-modules index.js diff",
     "reg": "time node --experimental-modules reg.js"
   },
   "author": "sv.junic",
