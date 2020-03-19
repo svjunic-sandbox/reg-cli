@@ -14,20 +14,31 @@ async function setup(data) {
       '--no-first-run',
       '--no-sandbox',
       '--no-zygote',
-      '--single-process'
+      '--single-process',
+      '--incognito'
     ]
   });
 
   page = await browser.newPage();
 
-  await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
-  );
+  // TODO: あとでデバイス振り分けができるようにする
+  //let pc = true;
+  let pc = false;
 
-  await page.setViewport({
-    width: viewportWidth,
-    height: viewportHeight
-  });
+  if (pc) {
+    await page.setUserAgent(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
+    );
+
+    await page.setViewport({
+      width: viewportWidth,
+      height: viewportHeight
+    });
+  } else {
+    // 選択するパターン
+    const devices = require('puppeteer/DeviceDescriptors');
+    await page.emulate(devices['iPhone X']);
+  }
 }
 
 async function capture(data) {

@@ -10,9 +10,9 @@
   "author": "sv.junic",
   "license": "UNLICENSED",
   "dependencies": {
-    "puppeteer": "^2.0.0"
+    "puppeteer": "^2.1.1"
   },
   "devDependencies": {
-    "reg-cli": "^0.15.12"
+    "reg-cli": "^0.16.0"
   }
 }
