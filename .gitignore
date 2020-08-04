@@ -17,6 +17,7 @@ keys.mjs
 config.js
 reg.json
 
+*.back
 results*
 
 *.log

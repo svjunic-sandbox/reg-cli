@@ -1,151 +1,46 @@
-import fs from 'fs';
-import puppeteer from 'puppeteer';
+//import { Cluster } from 'puppeteer-cluster';
+//import createdir from './modules/createdir.js';
+//import OS from 'os';
 
-import { fork, execSync } from 'child_process';
+const { Cluster } = require('puppeteer-cluster');
+const OS = require('os');
+const createdir = require('./modules/createdir.js');
+const createQuery = require('./modules/createQuery.js');
+const capture = require('./modules/capture.js');
 
-//const getCapture = require('./getCapture.js');
+const version = process.argv[2];
+const device = process.argv[3];
 
-import { PATH_LIST, UA, HOSTS } from './config.js';
-
-import OS from 'os';
 //const CPUs = OS.cpus().length;
 const CPUs = 1;
 
-//const dirlist = ['./results/production', './results/development', './results/cli', './results/diff'];
-let ua = '';
-const dirlist = [];
+// ディレクトリ作成
+createdir(version);
 
-const childs = [];
+// クエリの作成
+const queries = createQuery({ device, version });
 
-const VERSION = process.argv[2];
-const DEVICE = process.argv[3];
-const PATH_LIST_DEVICE = PATH_LIST[DEVICE];
-
-console.log(DEVICE);
-console.log(PATH_LIST_DEVICE);
-
-switch (VERSION) {
-  case 'before':
-    dirlist.push('./results/pc/before/');
-    dirlist.push('./results/sp/before/');
-    dirlist.push('./results/mb/before/');
-    break;
-  case 'after':
-    dirlist.push('./results/pc/after/');
-    dirlist.push('./results/sp/after/');
-    dirlist.push('./results/mb/after/');
-    break;
-  default:
-    dirlist.push('./results/pc/before/');
-    dirlist.push('./results/sp/before/');
-    dirlist.push('./results/mb/before/');
-    dirlist.push('./results/pc/after/');
-    dirlist.push('./results/sp/after/');
-    dirlist.push('./results/mb/after/');
-    break;
-}
-
-switch (DEVICE) {
-  case 'PC':
-    ua = UA.PC;
-    break;
-  case 'SP':
-    ua = UA.SP;
-    break;
-  case 'MB':
-    ua = UA.MB;
-    break;
-  default:
-    ua = UA.PC;
-    break;
-}
-
-for (let i = 0; i < dirlist.length; ++i) {
-  let path = dirlist[i];
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path, { recursive: true });
-  }
-}
-
-const SUBROUTINE_SCRIPT_PATH = './getCapture.cjs';
-
-function createQuery() {
-  const queries = [];
-  for (let i = 0; i < PATH_LIST_DEVICE.length; ++i) {
-    let url = PATH_LIST_DEVICE[i];
-
-    queries.push({
-      url: `${HOSTS.production}${url}`,
-      device: DEVICE,
-      ua: ua,
-      output: `results/${DEVICE}/${VERSION}/${url.replace(/:/g, '').replace(/\/$/g, '_index.html').replace(/\//g, '_').replace(/^_/g, '')}.png`,
-    });
-  }
-
-  return queries;
-}
-
-function setup(threadNumber) {
-  childs[threadNumber].send({ query: 'setup', threadNumber: threadNumber });
-}
-
-function close(threadNumber) {
-  childs[threadNumber].send({ query: 'close', threadNumber: threadNumber });
-}
-
-function getCapture(threadNumber) {
-  childs[threadNumber].send({ query: 'close', threadNumber: threadNumber });
-  const query = queries.length > 0 ? queries.shift() : undefined;
-  const processExit = queries.length < childs.length;
-  childs[threadNumber].send({ query: query, processExit: processExit, threadNumber: threadNumber });
-}
-
-// 他プロセスの作成
-//const CPUs = require('os').cpus().length;
-let usingThreadNumber = CPUs;
-
-for (let i = 0; i < CPUs; ++i) {
-  let child = fork(SUBROUTINE_SCRIPT_PATH);
-
-  child.on('message', (data) => {
-    if (data.message === 'exit') usingThreadNumber--;
-    if (data.message === 'close') usingThreadNumber--;
-
-    // errorでも次に進む
-    if ((data.message === 'fix' || data.message === 'error' || data.message === 'setup-fix') && queries.length > 0) {
-      getCapture(data.threadNumber);
-    } else {
-      close(data.threadNumber);
-    }
-
-    if (usingThreadNumber === 0) {
-      console.log('thread exit');
-      exec_reg();
-      process.exit();
-      return;
-    }
+(async () => {
+  const cluster = await Cluster.launch({
+    concurrency: Cluster.CONCURRENCY_CONTEXT,
+    monitor: true,
+    maxConcurrency: 1,
+    //maxConcurrency: CPUs,
   });
-  childs.push(child);
-}
 
-// クエリの生成
-const queries = createQuery();
+  await cluster.task(async ({ page, data }) => {
+    console.log(data);
+    await capture({ page, data });
+    // Store screenshot, do something else
+  });
 
-// 実行
-for (let i = 0; i < childs.length; ++i) {
-  //getCapture(i);
-  setup(i);
-}
-
-function exec_reg() {
-  try {
-    //reg
-    //execSync('node ./node_modules/reg-cli/dist/cli.js ./results/development/ ./results/production/ ./results/diff/ -R ./results/report.html');
-  } catch (err) {
-    err.stdout;
-    err.stderr;
-    err.pid;
-    err.signal;
-    err.status;
+  for (let i = 0; i < queries.length; ++i) {
+    const data = queries[i];
+    //console.log(data);
+    cluster.queue(data);
   }
-}
+  // many more pages
+
+  await cluster.idle();
+  await cluster.close();
+})();

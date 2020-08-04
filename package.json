@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "echo 'nothing!'",
     "before": "npm run before-pc && npm run before-sp && npm run before-mb",
@@ -19,7 +18,8 @@
   "author": "sv.junic",
   "license": "UNLICENSED",
   "dependencies": {
-    "puppeteer": "^5.2.1"
+    "puppeteer": "^5.2.1",
+    "puppeteer-cluster": "^0.21.0"
   },
   "devDependencies": {
     "reg-cli": "^0.16.1"
