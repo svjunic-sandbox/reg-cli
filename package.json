@@ -8,20 +8,20 @@
     "start": "echo 'nothing!'",
     "before": "npm run before-pc && npm run before-sp && npm run before-mb",
     "after": "npm run after-pc && npm run after-sp && npm run after-mb",
-    "before-pc": "time node --experimental-modules index.js before PC",
-    "before-sp": "time node --experimental-modules index.js before SP",
-    "before-mb": "time node --experimental-modules index.js before MB",
-    "after-pc": "time node --experimental-modules index.js after PC",
-    "after-sp": "time node --experimental-modules index.js after SP",
-    "after-mb": "time node --experimental-modules index.js after MB",
+    "before-pc": "time node index.js before PC",
+    "before-sp": "time node index.js before SP",
+    "before-mb": "time node index.js before MB",
+    "after-pc": "time node index.js after PC",
+    "after-sp": "time node index.js after SP",
+    "after-mb": "time node index.js after MB",
     "reg": "time node --experimental-modules reg.js"
   },
   "author": "sv.junic",
   "license": "UNLICENSED",
   "dependencies": {
-    "puppeteer": "^2.0.0"
+    "puppeteer": "^5.2.1"
   },
   "devDependencies": {
-    "reg-cli": "^0.15.12"
+    "reg-cli": "^0.16.1"
   }
 }
