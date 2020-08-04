@@ -14,4 +14,9 @@ const PATH_LIST = {
   MB: ['/']
 };
 
-export { HOSTS, UA, PATH_LIST };
+module.exports = {
+  HOSTS,
+  UA,
+  PATH_LIST,
+};
+//export { HOSTS, UA, PATH_LIST };
